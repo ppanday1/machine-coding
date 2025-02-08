@@ -20,6 +20,9 @@
 
     <modules>
         <module>library-management</module>
+        <module>parking-lot</module>
+        <module>rental-service</module>
+        <module>appointment-scheduler</module>
     </modules>
 
     <dependencies>
