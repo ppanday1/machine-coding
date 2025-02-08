@@ -1,76 +1,19 @@
-Question:
-https://leetcode.com/discuss/interview-experience/1400137/flipkart-machine-coding-sde-3-bangalore-august-2021-reject
+https://leetcode.com/discuss/interview-experience/5650840/Flipkart-or-SDE-2-or-Bengaluru-or-July-2024-or-Offer/
 
-Description:
-Flipkart is starting a new vehicle rental service called FlipKar. In this service, we will rent different kinds of vehicles such as cars and bikes.
+You are required to build an application that lets patients connect to doctors and book appointments. The day is divided into time slots of 30 mins each, starting from 9 am to 9 pm. Doctors can login to the portal and declare their availability for the given day in terms of slots. Patients can login and book appointments/ cancel existing appointments.
+For simplicity you can assume that the doctors’ availability is declared for that particular day only.
 
-
-Features:
-
-
-Rental service has multiple branches throughout the city.
-Each branch has a limited number of different kinds of vehicles.
-Each vehicle can be booked with a predefined price per unit time slot.
-For simplicity, the current pricing model does not support dynamic pricing
-or update on prices based on seasonality.
-Each vehicle can be booked in multiples of 1 hour time slot.
-All bookings should be made before the start time of particular booking.
-Requirements:
-
-
-Onboard a new branch with available vehicles.
-Onboard new vehicle(s) of existing type to a particular branch.
-Rent vehicle for a time slot and a vehicle type
-(lowest price as the default choice of selection of vehicle, this should be extendable to any other strategy).
-While booking a vehicle if availability is not there, then it should fallback to another available branch,
-which is derived based on the vehicle selection strategy.
-A system view should be made available, such as currently blocked vehicles,
-available vehicles of all the branches.
-Bonus:
-
-
-While booking a vehicle, if 2 branches are providing vehicle at the same price,
-give priority to the nearest branch.
-Other Notes:
-
-
-Do not use any database or NoSQL store, use in-memory data-structure for now.
-Do not create any UI for the application.
-Write a driver class for demo purpose. Which will execute all the commands at one place in the code and have test cases.
-Please prioritize code compilation, execution and completion.
-Work on the expected output first and then add good-to-have features of your own.
-Expectations:
-
-
-Make sure that you have working and demonstrable code.
-Make sure that code is functionally correct.
-Make sure concurrent requests are handled appropriately.
-Code should be modular and readable.
-Separation of concern should be addressed.
-Code should easily accommodate new requirements with minimal changes.
-Code should be easily testable. Demo with Unit Tests
-Test cases:
-
-
-•	add_branch(‘koramangala’, [“1 suv for Rs.12 per hour”, “3 sedan for Rs.10 per hour”, “3 bikes for Rs.20 per hour”]);
-•	add_branch(‘jayanagar’, [“3 sedan for Rs.11 per hour”, “3 bikes for Rs.30 per hour”, “4 hatchback for Rs.8 per hour”]);
-•	add_branch(‘malleshwaram’, [“1 suv for Rs.11 per hour”, “10 bikes for Rs.3 per hour” , “3 sedan for Rs.10 per hour”]);
-•	add_vehicle(‘koramangala’,  “1 sedan”); //add 1 sedan to koramangala
-•	rent_vehicle(‘suv’, 20th Feb 10:00 PM, 20th Feb 12:00 PM); // should book from malleshwaram.
-•	rent_vehicle(‘suv’, 20th Feb 10:00 PM, 20th Feb 12:00 PM); // should book from koramangala.
-•	rent_vehicle(‘suv’, 20th Feb 10:00 PM, 20th Feb 12:00 PM); //Should fail saying no vehicle.
-•	print_system_view_for_time_slot(20th Feb 11:00 PM, 20th Feb 12:00 PM);
-
-o	Output:
-	‘Koramangala’:
-	All “suv” are booked.
-	“sedan” is available for Rs.10
-	“bike” is available for Rs.20
-	‘Jayanagar’:
-	“sedan” is available for Rs.11
-	“bike” is available for Rs.30
-	“hatchback” is available for Rs.8
-	‘‘Malleshwaram’’:
-	All “suv” are booked.
-	“bike” is available for Rs.3
-	“sedan” is available for Rs.10
+Functionalities required:
+A new doctor should be able to register, and mention his/her speciality among (Cardiologist, Dermatologist, Orthopedic, General Physician)
+A doctor should be able to declare his/her availability in each slot for the day. For example, the slots will be of 30 mins like 9am-9.30am, 9.30am-10am..
+Patients should be able to login, and search available slots based on speciality.  
+The slots should be displayed in a ranked fashion. Default ranking strategy should be to rank by start time. But we should be able to plugin more strategies like Doctor’s rating etc in future.
+Patients should be able to book appointments with a doctor for an available slot.A patient can book multiple appointments in a day.  A patient cannot book two appointments with two different doctors in the same time slot.
+Patients can also cancel an appointment, in which case that slot becomes available for someone else to book.
+Build a waitlist feature:
+If the patient wishes to book a slot for a particular doctor that is already booked, then add this patient to the waitlist. If the patient with whom the appointment is booked originally, cancels the appointment, then the first in the waitlist gets the appointment.
+A patient/doctor should be able to view his/her booked appointments for the day.  
+Doctors can’t provide overlapping slots.
+Implementing login feature is optional
+Patient registration is not mandatory
+Name of Doctor and patient are their identifiers
