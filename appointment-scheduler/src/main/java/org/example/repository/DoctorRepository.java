@@ -27,14 +27,14 @@ public class DoctorRepository {
     public List<Doctor> findDoctorForSpeciality(Speciality speciality) {
         List<Doctor> result = new ArrayList<>();
         for (Doctor doctor : doctors.values()) {
-            if (doctor.getSpeciality() == speciality) {
+            if (doctor.getSpeciality().equals(speciality)) {
                 result.add(doctor);
             }
         }
         return result;
     }
 
-    public Doctor getUser(String name){
+    public Doctor getDoctor(String name) {
         return doctors.get(name);
     }
 }

@@ -7,11 +7,11 @@ import org.example.model.Speciality;
 import org.example.repository.BookingRepository;
 import org.example.repository.DoctorRepository;
 import org.example.repository.SlotRepository;
-import org.example.strategy.DefaultRankingStrategy;
 import org.example.strategy.RankingStrategy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -44,10 +44,21 @@ public class UserService {
     }
 
     public boolean declareAvailability(String name, List<LocalTime> times) {
-        if (doctorRepository.getUser(name) == null) {
+        if (doctorRepository.getDoctor(name) == null) {
             log.info("Doctor doesn't exist {}", name);
         }
-        return slotRepository.addSlotForDoctor(name, times);
+        HashSet<LocalTime> uniqueSlots = new HashSet<>(times);
+        if (uniqueSlots.size() != times.size()) {
+            log.error("Slots provided are not unique");
+            return false;
+        }
+        LocalTime start = LocalTime.of(9, 0);  // 9:00 AM
+        LocalTime end = LocalTime.of(21, 0);   // 9:00 PM
+
+        if(times.stream().allMatch(time -> !time.isBefore(start) && !time.isAfter(end))){
+            return slotRepository.addSlotForDoctor(name, times);
+        };
+        return false;
     }
 
     public List<Slot> searchDoctor(String spec) {

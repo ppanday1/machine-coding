@@ -2,18 +2,13 @@ package org.example.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.example.model.Booking;
-import org.example.model.Slot;
 import org.example.repository.BookingRepository;
 import org.example.repository.DoctorRepository;
 import org.example.repository.SlotRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,44 +25,52 @@ public class BookingService {
         this.bookingRepository = bookingRepository;
     }
 
-    public synchronized boolean bookAppointment(String doctorName, String patientName, LocalTime time) {
+    public boolean bookAppointment(String doctorName, String patientName, LocalTime time) {
+        synchronized (this) {
+            if (doctorRepository.getDoctor(doctorName) == null) {
+                return false;
+            }
+            //Patient is not free
+            List<Booking> bookingForPatientAtTime = bookingRepository.getBookingByPatient(patientName)
+                    .stream()
+                    .filter(e -> e.getMeetingTime().equals(time)).toList();
+            if (bookingForPatientAtTime.size() > 0) {
+                log.error("Already booked at time");
+                return false;
+            }
 
-        if (doctorRepository.getUser(doctorName) == null) {
-            return false;
+            //check if doctor is not free
+            if (!slotRepository.bookSlotForDoctor(doctorName, time, patientName)) {
+                return false;
+            }
+            Booking booking = new Booking(doctorName, patientName, time);
+            bookingRepository.addBooking(booking);
         }
-        //Patient is not free
-        List<Booking> bookingForPatientAtTime = bookingRepository.getBookingByPatient(patientName)
-                .stream()
-                .filter(e -> e.getMeetingTime().equals(time)).toList();
-        if (bookingForPatientAtTime.size() > 0) {
-            log.error("Already booked at time");
-            return false;
-        }
-
-        //check if doctor is not free
-        if (!slotRepository.bookSlotForDoctor(doctorName, time, patientName)) {
-            return false;
-        }
-        Booking booking = new Booking(doctorName, patientName, time);
-        bookingRepository.addBooking(booking);
         return true;
     }
 
-    public synchronized boolean  cancelAppointment(String doctorName, String patientName, LocalTime time) {
-        if (doctorRepository.getUser(doctorName) == null) {
-            return false;
+    public boolean cancelAppointment(String doctorName, String patientName, LocalTime time) {
+        String waitingListUser = "";
+        synchronized (this) {
+            if (doctorRepository.getDoctor(doctorName) == null) {
+                return false;
+            }
+            List<Booking> bookingsForPatient = bookingRepository.getBookingByPatient(patientName);
+            List<Booking> bookings = bookingsForPatient.stream()
+                    .filter(e -> e.getDoctorName().equals(doctorName) && e.getMeetingTime().equals(time))
+                    .toList();
+            if (bookings.size() != 1) {
+                log.error("Why not one? ");
+                return false;
+            }
+            Booking booking = bookings.get(0);
+            bookingRepository.removeBooking(booking);
+            waitingListUser = slotRepository.releaseSlotForDoctor(doctorName, time);
+            if(!waitingListUser.equals("")){
+                Booking bookingForWaitListedUser = new Booking(doctorName,waitingListUser,time);
+                bookingRepository.addBooking(bookingForWaitListedUser);
+            }
         }
-        List<Booking> bookingsForPatient = bookingRepository.getBookingByPatient(patientName);
-        List<Booking> bookings = bookingsForPatient.stream()
-                .filter(e -> e.getDoctorName().equals(doctorName) && e.getMeetingTime().equals(time))
-                .toList();
-        if (bookings.size() != 1) {
-            log.error("Why not one? ");
-            return false;
-        }
-        Booking booking = bookings.get(0);
-        bookingRepository.removeBooking(booking);
-        slotRepository.releaseSlotForDoctor(doctorName, time);
         return true;
     }
 }

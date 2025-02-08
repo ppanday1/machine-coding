@@ -1,7 +1,6 @@
 package org.example.repository;
 
 import org.example.model.Slot;
-import org.example.model.Speciality;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalTime;
@@ -38,18 +37,18 @@ public class SlotRepository {
 
     public List<Slot> getAvailableSlotForDoctors(List<String> doctors) {
         List<Slot> result = new ArrayList<>();
-        for (String doctorName: doctors){
+        for (String doctorName : doctors) {
             result.addAll(getAvailableSlotForDoctor(doctorName));
         }
         return result;
     }
 
     public boolean bookSlotForDoctor(String doctorName, LocalTime time, String user) {
-        for (Slot slot : slots.get(doctorName)) {
-            if (slot.getLocalTime().equals(time) ) {
-                if(slot.isBooked()){
-                    slot.registerUser(user);
-                }else{
+        for (Slot slot : slots.getOrDefault(doctorName, new ArrayList<>())) {
+            if (slot.getLocalTime().equals(time)) {
+                if (slot.isBooked()) {
+                    slot.waitListPatient(user);
+                } else {
                     slot.bookSlot();
                 }
                 return true;
@@ -58,14 +57,13 @@ public class SlotRepository {
         return false;
     }
 
-    public boolean releaseSlotForDoctor(String doctorName, LocalTime time) {
-        for (Slot slot : slots.get(doctorName)) {
+    public String releaseSlotForDoctor(String doctorName, LocalTime time) {
+        for (Slot slot : slots.getOrDefault(doctorName, new ArrayList<>())) {
             if (slot.getLocalTime().equals(time) && slot.isBooked()) {
-                slot.releaseSlot();
-                return true;
+                return slot.releaseSlot();
             }
         }
-        return false;
+        return "";
     }
 
 

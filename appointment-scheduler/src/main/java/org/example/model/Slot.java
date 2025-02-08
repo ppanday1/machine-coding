@@ -15,26 +15,31 @@ public class Slot {
     private LocalTime localTime;
     private boolean isBooked;
 
-    private Queue<String> userQueue;
+    private Queue<String> waitListQueue;
 
     public Slot(String doctorName, LocalTime localTime) {
         this.doctorName = doctorName;
         this.localTime = localTime;
         this.isBooked = false;
-        userQueue = new LinkedList<>();
+        waitListQueue = new LinkedList<>();
     }
 
     public void bookSlot() {
         isBooked = true;
     }
 
-    public void releaseSlot() {
-        isBooked = false;
-        notifyUser();
+    public String releaseSlot() {
+        if(waitListQueue.size()==0){
+            isBooked=false;
+            return "";
+        }
+        isBooked = true;
+        return notifyUserInWaitList();
     }
 
-    public void notifyUser() {
-        log.info("{} user notified", userQueue.poll());
+    public String notifyUserInWaitList() {
+//        log.info("{} user notified", userQueue.poll());
+        return waitListQueue.poll();
     }
 
     @Override
@@ -50,7 +55,7 @@ public class Slot {
         return Objects.hash(doctorName, localTime);
     }
 
-    public void registerUser(String user) {
-        userQueue.add(user);
+    public void waitListPatient(String user) {
+        waitListQueue.add(user);
     }
 }
