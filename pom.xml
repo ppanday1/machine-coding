@@ -9,13 +9,19 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.example</groupId>
-    <artifactId>SpringRestAPI</artifactId>
+    <artifactId>machine-coding</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>SpringRestAPI</name>
     <description>Demo project for Spring Boot Rest API</description>
+    <packaging>pom</packaging>
     <properties>
         <java.version>19</java.version>
     </properties>
+
+    <modules>
+        <module>library-management</module>
+    </modules>
+
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -56,7 +62,6 @@
             <artifactId>spring-boot-starter-logging</artifactId>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
