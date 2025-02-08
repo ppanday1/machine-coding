@@ -7,13 +7,14 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class SlotRepository {
-    HashMap<String, List<Slot>> slots;
+    ConcurrentHashMap<String, List<Slot>> slots;
 
     public SlotRepository() {
-        slots = new HashMap<>();
+        slots = new ConcurrentHashMap<>();
     }
 
     public boolean addSlotForDoctor(String name, List<LocalTime> times) {

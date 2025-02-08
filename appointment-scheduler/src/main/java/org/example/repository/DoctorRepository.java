@@ -7,13 +7,14 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class DoctorRepository {
-    HashMap<String, Doctor> doctors;
+    ConcurrentHashMap<String, Doctor> doctors;
 
     public DoctorRepository() {
-        doctors = new HashMap<>();
+        doctors = new ConcurrentHashMap<>();
     }
 
     public boolean addDoctor(String name, Speciality speciality) {
