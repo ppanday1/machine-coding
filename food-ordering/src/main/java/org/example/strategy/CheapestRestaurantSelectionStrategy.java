@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class CheapestOrderSelectionStrategy implements OrderSelectionStrategy {
+public class CheapestRestaurantSelectionStrategy implements RestaurantSelectionStrategy {
     @Override
     public Restaurant getCheapestRestaurantForItem(List<Restaurant> restaurants, Item item) {
         Restaurant result = null;

@@ -7,7 +7,7 @@ import java.util.HashSet;
 
 @Repository
 public class PastOrderRepository {
-    private HashSet<Order> orders;
+    private final HashSet<Order> orders;
 
     public PastOrderRepository() {
         this.orders = new HashSet<>();

@@ -5,6 +5,6 @@ import org.example.model.Restaurant;
 
 import java.util.List;
 
-public interface OrderSelectionStrategy {
+public interface RestaurantSelectionStrategy {
     Restaurant getCheapestRestaurantForItem(List<Restaurant>restaurants, Item item);
 }

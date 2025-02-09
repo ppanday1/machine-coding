@@ -3,12 +3,11 @@ package org.example.repository;
 import org.example.model.Item;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class ItemRepository {
-    private ConcurrentHashMap<String, Item> items;
+    private final ConcurrentHashMap<String, Item> items;
 
     public ItemRepository() {
         this.items = new ConcurrentHashMap<>();

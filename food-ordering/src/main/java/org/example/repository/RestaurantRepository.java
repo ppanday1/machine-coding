@@ -3,7 +3,6 @@ package org.example.repository;
 import org.example.model.Restaurant;
 import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 

@@ -1,6 +1,5 @@
 package org.example.service;
 
-import ch.qos.logback.core.joran.sanity.Pair;
 import org.example.model.Item;
 import org.example.model.Order;
 import org.example.model.OrderDetail;
@@ -9,7 +8,8 @@ import org.example.repository.ItemRepository;
 import org.example.repository.OngoingOrderRepository;
 import org.example.repository.PastOrderRepository;
 import org.example.repository.RestaurantRepository;
-import org.example.strategy.OrderSelectionStrategy;
+import org.example.strategy.CheapestRestaurantSelectionStrategy;
+import org.example.strategy.RestaurantSelectionStrategy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,20 +24,20 @@ public class OrderService {
     PastOrderRepository pastOrderRepository;
     ItemRepository itemRepository;
 
-    OrderSelectionStrategy orderSelectionStrategy;
+    RestaurantSelectionStrategy restaurantSelectionStrategy;
 
-    private AtomicInteger orderNumber;
+    private final AtomicInteger orderNumber;
 
     public OrderService(RestaurantRepository restaurantRepository,
                         OngoingOrderRepository ongoingOrderRepository,
                         PastOrderRepository pastOrderRepository,
                         ItemRepository itemRepository,
-                        OrderSelectionStrategy orderSelectionStrategy) {
+                        CheapestRestaurantSelectionStrategy orderSelectionStrategy) {
         this.restaurantRepository = restaurantRepository;
         this.ongoingOrderRepository = ongoingOrderRepository;
         this.pastOrderRepository = pastOrderRepository;
         this.itemRepository = itemRepository;
-        this.orderSelectionStrategy = orderSelectionStrategy;
+        this.restaurantSelectionStrategy = orderSelectionStrategy;
         orderNumber = new AtomicInteger(0);
     }
 
@@ -57,7 +57,7 @@ public class OrderService {
                     candidate.add(restaurant);
                 }
             }
-            Restaurant result = orderSelectionStrategy.getCheapestRestaurantForItem(candidate, item);
+            Restaurant result = restaurantSelectionStrategy.getCheapestRestaurantForItem(candidate, item);
             allServingRest.add(result);
             double price = result.getPriceForItem(item);
             orderItems.add(new OrderDetail(result, item, price));
@@ -91,6 +91,6 @@ public class OrderService {
         for (Restaurant restaurant : restaurants) {
             restaurant.replenish();
         }
-        return "Order completed " + order.toString();
+        return "Order completed " + order;
     }
 }
