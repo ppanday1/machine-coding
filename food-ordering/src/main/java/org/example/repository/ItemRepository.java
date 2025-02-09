@@ -4,13 +4,14 @@ import org.example.model.Item;
 import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class ItemRepository {
-    private HashMap<String, Item> items;
+    private ConcurrentHashMap<String, Item> items;
 
     public ItemRepository() {
-        this.items = new HashMap<>();
+        this.items = new ConcurrentHashMap<>();
     }
 
     public Item getItemsByName(String itemName){

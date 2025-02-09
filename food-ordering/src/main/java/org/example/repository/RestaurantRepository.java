@@ -5,13 +5,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class RestaurantRepository {
-    private final HashMap<String, Restaurant> restaurants;
+    private final ConcurrentHashMap<String, Restaurant> restaurants;
 
     public RestaurantRepository() {
-        this.restaurants = new HashMap<>();
+        this.restaurants = new ConcurrentHashMap<>();
     }
 
     public Restaurant getRestaurantByName(String name) {
