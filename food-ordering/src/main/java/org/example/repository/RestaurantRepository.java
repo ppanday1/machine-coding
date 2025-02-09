@@ -19,11 +19,7 @@ public class RestaurantRepository {
     }
 
     public boolean addRestaurant(Restaurant restaurant) {
-        if (restaurants.containsKey(restaurant.getName())) {
-            return false;
-        }
-        restaurants.put(restaurant.getName(), restaurant);
-        return true;
+        return restaurants.putIfAbsent(restaurant.getName(), restaurant) == null;
     }
 
     public List<Restaurant> getAllRestaurant() {

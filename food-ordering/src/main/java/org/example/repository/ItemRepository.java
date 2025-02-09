@@ -13,15 +13,11 @@ public class ItemRepository {
         this.items = new ConcurrentHashMap<>();
     }
 
-    public Item getItemsByName(String itemName){
+    public Item getItemsByName(String itemName) {
         return items.getOrDefault(itemName, null);
     }
 
-    public boolean putItemByName(String itemName){
-        if(!items.containsKey(itemName)){
-            items.put(itemName,new Item(itemName));
-            return true;
-        }
-        return false;
+    public boolean putItemByName(String itemName) {
+        return items.putIfAbsent(itemName, new Item(itemName)) == null;
     }
 }

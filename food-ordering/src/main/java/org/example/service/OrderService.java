@@ -77,11 +77,11 @@ public class OrderService {
     }
 
     public synchronized String fulFillOrder(int orderNumber) {
-        Order order = ongoingOrderRepository.getOrder(orderNumber);
+        Order order = ongoingOrderRepository.getOrderByOrderNumber(orderNumber);
         if (order == null) {
             return "No Such Order";
         }
-        ongoingOrderRepository.removeOrder(orderNumber);
+        ongoingOrderRepository.deleteOrderByOrderNumber(orderNumber);
         pastOrderRepository.addOrder(order);
 
         HashSet<Restaurant> restaurants = new HashSet<>();
