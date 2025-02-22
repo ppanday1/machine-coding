@@ -24,6 +24,7 @@
         <module>rental-service</module>
         <module>appointment-scheduler</module>
         <module>food-ordering</module>
+        <module>cache-management</module>
     </modules>
 
     <dependencies>
