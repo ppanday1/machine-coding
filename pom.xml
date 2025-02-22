@@ -25,6 +25,7 @@
         <module>appointment-scheduler</module>
         <module>food-ordering</module>
         <module>cache-management</module>
+        <module>affiliate-system</module>
     </modules>
 
     <dependencies>
