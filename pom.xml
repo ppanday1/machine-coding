@@ -26,6 +26,7 @@
         <module>food-ordering</module>
         <module>cache-management</module>
         <module>affiliate-system</module>
+        <module>stackoverflow</module>
     </modules>
 
     <dependencies>

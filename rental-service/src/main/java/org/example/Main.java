@@ -62,6 +62,5 @@ public class Main {
 
         // Parse the input string into LocalDateTime
         return LocalDateTime.parse(input, formatter);
-
     }
 }
