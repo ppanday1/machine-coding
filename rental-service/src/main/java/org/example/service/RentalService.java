@@ -1,5 +1,8 @@
-package org.example.model;
+package org.example.service;
 
+import org.example.model.Branch;
+import org.example.model.Vehicle;
+import org.example.model.VehicleType;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

@@ -1,5 +1,7 @@
-package org.example.model;
+package org.example.controller;
 
+import org.example.model.Vehicle;
+import org.example.service.RentalService;
 import org.springframework.stereotype.Controller;
 
 import java.time.LocalDateTime;

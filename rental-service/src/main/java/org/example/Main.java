@@ -1,10 +1,7 @@
 package org.example;
 
-import org.example.model.RentalController;
-import org.example.model.RentalService;
-import org.example.model.Vehicle;
-import org.example.model.VehicleType;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.controller.RentalController;
+import org.example.service.RentalService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
