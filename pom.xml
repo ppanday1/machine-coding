@@ -27,6 +27,7 @@
         <module>cache-management</module>
         <module>affiliate-system</module>
         <module>stackoverflow</module>
+        <module>clear-fit</module>
     </modules>
 
     <dependencies>
