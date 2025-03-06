@@ -9,6 +9,8 @@ import org.example.model.Slot;
 import org.example.repository.CenterDetailRepository;
 import org.example.repository.CenterRepository;
 import org.example.repository.SlotRepository;
+import org.example.sortingstrategy.SlotSortingStrategy;
+import org.example.sortingstrategy.SortingStrategyFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +23,16 @@ public class CenterService {
     private final CenterDetailRepository centerDetailRepository;
     private final CenterRepository centerRepository;
     private final SlotRepository slotRepository;
+    private final SortingStrategyFactory sortingStrategyFactory;
 
     public CenterService(CenterDetailRepository centerDetailRepository,
                          CenterRepository centerRepository,
-                         SlotRepository slotRepository) {
+                         SlotRepository slotRepository,
+                         SortingStrategyFactory sortingStrategyFactory) {
         this.centerDetailRepository = centerDetailRepository;
         this.centerRepository = centerRepository;
         this.slotRepository = slotRepository;
+        this.sortingStrategyFactory = sortingStrategyFactory;
     }
 
     public synchronized void addCenter(String name) {
@@ -93,23 +98,20 @@ public class CenterService {
         }
     }
 
-    public synchronized void viewWorkoutAvailability(String centerName) {
-        List<Slot> slots = slotRepository.getSlotByCenter(centerName);
-        for (Slot slot : slots) {
-            if (slot.getAvailableSlots() > 0) {
-                log.info("{} ", slot);
-            }
-        }
+    public synchronized void viewWorkoutAvailability(String workoutType) {
+        Activity activity = Activity.valueOf(workoutType);
+        List<Slot> slots = slotRepository.getSlotByActivity(activity);
+        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy("TIME");
+        List<Slot> sortedSlots = slotSortingStrategy.sort(slots);
+        log.info("Available slots are {}", sortedSlots);
     }
 
     public synchronized void viewWorkoutAvailability(String centerName, String workoutType) {
         Activity activity = Activity.valueOf(workoutType);
         List<Slot> slots = slotRepository.getSlotByCenterAndWorkout(centerName, activity);
-        for (Slot slot : slots) {
-            if (slot.getAvailableSlots() > 0) {
-                log.info("{} ", slot);
-            }
-        }
+        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy("AVAILABILITY");
+        List<Slot> sortedSlots = slotSortingStrategy.sort(slots);
+        log.info("Available slots are {}", sortedSlots);
     }
 
     private boolean checkForConflict(List<Pair<Integer, Integer>> timings) {

@@ -9,13 +9,13 @@ Requirements
    Workout Variations (e.g., Weights, Cardio, Yoga, Swimming, etc.)
    Each center can have multiple workout variations.
    New workout types may be added in the future.
-2. Defining Workout Slots
-   Each center will define workout slots within its operating hours.
-   Admin defines these slots daily, and once set, updates are not allowed.
-   At any given time, only one workout can be scheduled at a center.
-   Each workout slot has fixed seat capacity.
-3. End-User Operations
-   Users (customers) can:
+   2. Defining Workout Slots
+      Each center will define workout slots within its operating hours.
+      Admin defines these slots daily, and once set, updates are not allowed.
+      At any given time, only one workout can be scheduled at a center.
+      Each workout slot has fixed seat capacity.
+   3. End-User Operations
+      Users (customers) can:
 
 (Optional) Register onto the platform (authentication not required).
 View workout slot availability for the day:

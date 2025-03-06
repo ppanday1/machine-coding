@@ -56,7 +56,17 @@ public class SlotRepository {
         return slots.values().stream().filter(e -> e.getCenterName().equals(centerName)).toList();
     }
 
+    public List<Slot> getSlotByActivity(Activity activity) {
+        return slots.values()
+                .stream()
+                .filter(e -> e.getActivity().equals(activity) && e.getAvailableSlots() > 0)
+                .toList();
+    }
+
     public List<Slot> getSlotByCenterAndWorkout(String centerName, Activity activity) {
-        return slots.values().stream().filter(e -> e.getCenterName().equals(centerName) && e.getActivity().equals(activity)).toList();
+        return slots.values()
+                .stream()
+                .filter(e -> e.getCenterName().equals(centerName) && e.getActivity().equals(activity) && e.getAvailableSlots() > 0)
+                .toList();
     }
 }

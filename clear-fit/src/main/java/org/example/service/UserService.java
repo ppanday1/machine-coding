@@ -14,7 +14,7 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void addUser(String userName) {
+    public synchronized void addUser(String userName) {
         try {
             User user = new User(userName);
             userRepository.saveUser(user);
