@@ -9,14 +9,14 @@ import java.util.UUID;
 
 @Data
 @Slf4j
-public class Slot {
+public class Slot implements WaitlistObservable {
     private String slotId;
     private String centerName;
     private int startTime;
     private int endTime;
     private int availableSlots;
     private Activity activity;
-    private Queue<String> waitingQueue;
+    private Queue<WaitlistObserver> waitingQueue;
 
     public Slot(String centerName, int startTime, int endTime, int availableSots, Activity activity) {
         this.slotId = UUID.randomUUID().toString();
@@ -28,27 +28,21 @@ public class Slot {
         waitingQueue = new LinkedList<>();
     }
 
-    public synchronized boolean bookSlot(String name) {
+    public synchronized boolean bookSlot(User user) {
         if (availableSlots > 0) {
             availableSlots--;
             return true;
         } else {
-            waitingQueue.add(name); //observer pattern to be implemented
+            addObserver(user); //observer pattern to be implemented
         }
         return false;
     }
 
-    public synchronized void releaseSlot() {
+    public synchronized User releaseSlot() {
         availableSlots++;
-        if(waitingQueue.size()!=0){
-            log.info("all queued user notified {}", waitingQueue);
-            waitingQueue.clear();
-        }
+        return notifyObserver();
     }
 
-    private void notifyUser(){
-        
-    }
 
     @Override
     public String toString() {
@@ -59,5 +53,20 @@ public class Slot {
                 ", availableSlots=" + availableSlots +
                 ", activity=" + activity +
                 '}';
+    }
+
+    @Override
+    public void addObserver(WaitlistObserver waitlistObserver) {
+        waitingQueue.add(waitlistObserver);
+    }
+
+    @Override
+    public User notifyObserver() {
+        if (waitingQueue.size() > 0) {
+            User user = (User) waitingQueue.poll();
+            user.update(this);
+            return user;
+        }
+        return null;
     }
 }

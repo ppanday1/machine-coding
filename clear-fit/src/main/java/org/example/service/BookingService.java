@@ -28,7 +28,7 @@ public class BookingService {
             Activity activity = Activity.valueOf(workoutType);
             User user = userRepository.getUserByName(userName);
             Slot slot = slotRepository.getSlotForCenterForTimingAndWorkoutType(centerName, startTime, endTime, activity);
-            if (!slot.bookSlot(user.getName())) {
+            if (!slot.bookSlot(user)) {
                 log.error("Slot is not free");
                 return;
             }
@@ -45,7 +45,7 @@ public class BookingService {
             Booking booking = bookingRepository.getBookingFor(userName, centerName, activity, startTime, endTime);
             bookingRepository.deleteBooking(booking);
             Slot slot=slotRepository.getSlotById(booking.getSlotId());
-            slot.releaseSlot();
+            User notifiedUser=slot.releaseSlot();
         } catch (Exception e) {
             log.error("Exception occurred while trying to cancle booking ", e);
         }
