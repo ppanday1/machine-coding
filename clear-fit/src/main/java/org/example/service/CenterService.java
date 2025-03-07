@@ -10,6 +10,7 @@ import org.example.repository.CenterDetailRepository;
 import org.example.repository.CenterRepository;
 import org.example.repository.SlotRepository;
 import org.example.sortingstrategy.SlotSortingStrategy;
+import org.example.sortingstrategy.SortingParam;
 import org.example.sortingstrategy.SortingStrategyFactory;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -101,7 +102,7 @@ public class CenterService {
     public synchronized void viewWorkoutAvailability(String workoutType) {
         Activity activity = Activity.valueOf(workoutType);
         List<Slot> slots = slotRepository.getSlotByActivity(activity);
-        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy("TIME");
+        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy(SortingParam.TIME);
         List<Slot> sortedSlots = slotSortingStrategy.sort(slots);
         log.info("Available slots are {}", sortedSlots);
     }
@@ -109,7 +110,7 @@ public class CenterService {
     public synchronized void viewWorkoutAvailability(String centerName, String workoutType) {
         Activity activity = Activity.valueOf(workoutType);
         List<Slot> slots = slotRepository.getSlotByCenterAndWorkout(centerName, activity);
-        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy("AVAILABILITY");
+        SlotSortingStrategy slotSortingStrategy = sortingStrategyFactory.getSortingStrategy(SortingParam.AVAILABLE_SLOT);
         List<Slot> sortedSlots = slotSortingStrategy.sort(slots);
         log.info("Available slots are {}", sortedSlots);
     }
@@ -119,21 +120,12 @@ public class CenterService {
     }
 
     private boolean isTimingWithinRange(int startTime, int endTime, List<Pair<Integer, Integer>> timings) {
-        for (Pair<Integer, Integer> timing : timings) {
-            if (timing.getFirst() <= startTime && timing.getSecond() >= endTime) {
-                return true;
-            }
-        }
-        return false;
+        return timings.stream()
+                .anyMatch(timing -> timing.getFirst() <= startTime && timing.getSecond() >= endTime);
     }
 
-    private boolean conflictForSlot(List<Slot> slots, int startTim, int endTime) {
-        return false;
-//        for (Slot slot : slots) {
-//            if (slot.getEndTime() <= startTim && slot.getEndTime() >= endTime) {
-//                return true;
-//            }
-//        }
-//        return false;
+    private boolean conflictForSlot(List<Slot> slots, int startTime, int endTime) {
+        return slots.stream()
+                .anyMatch(slot -> slot.getStartTime() < endTime && slot.getEndTime() > startTime);
     }
 }

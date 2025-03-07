@@ -12,10 +12,10 @@ public class SortingStrategyFactory {
         this.slotSortingByAvailability = slotSortingByAvailability;
     }
 
-    public SlotSortingStrategy getSortingStrategy(String sortingType) {
-        if (sortingType.equals("AVAILABILITY")) {
+    public SlotSortingStrategy getSortingStrategy(SortingParam sortingType) {
+        if (sortingType.equals(SortingParam.AVAILABLE_SLOT)) {
             return slotSortingByAvailability;
-        } else if (sortingType.equals("TIME")) {
+        } else if (sortingType.equals(SortingParam.TIME)) {
             return slotSortingByTime;
         }
         return null;

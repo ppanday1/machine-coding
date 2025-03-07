@@ -46,6 +46,10 @@ public class Slot {
         }
     }
 
+    private void notifyUser(){
+        
+    }
+
     @Override
     public String toString() {
         return "Slot{" +
