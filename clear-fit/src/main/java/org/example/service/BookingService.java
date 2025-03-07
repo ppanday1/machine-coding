@@ -44,10 +44,24 @@ public class BookingService {
             Activity activity = Activity.valueOf(workOutType);
             Booking booking = bookingRepository.getBookingFor(userName, centerName, activity, startTime, endTime);
             bookingRepository.deleteBooking(booking);
-            Slot slot=slotRepository.getSlotById(booking.getSlotId());
-            User notifiedUser=slot.releaseSlot();
+            Slot slot = slotRepository.getSlotById(booking.getSlotId());
+            User notifiedUser = slot.releaseSlot();
         } catch (Exception e) {
             log.error("Exception occurred while trying to cancle booking ", e);
+        }
+    }
+
+    public void notifyMe(String userName, String centreName, String workoutType, int startTime, int endTime) {
+        try {
+            Activity activity = Activity.valueOf(workoutType);
+            Slot slot = slotRepository.getSlotForCenterForTimingAndWorkoutType(centreName, startTime, endTime, activity);
+            User user = userRepository.getUserByName(userName);
+            if (slot != null && user != null && slot.getAvailableSlots() == 0) {
+                slot.addObserver(user);
+                System.out.println(userName + " added to waitlist for " + workoutType + " at " + centreName);
+            }
+        } catch (Exception e) {
+            log.error("Exception occurred while trying to add user{} to waitlist", userName, e);
         }
     }
 }
