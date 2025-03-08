@@ -18,8 +18,8 @@ public class BookingRepository {
     }
 
     public synchronized List<Booking> getBookingForUser(String userName) throws EntityDoesNotExistException {
-        List<Booking> bookingForUuser = bookings.values().stream().filter(e -> e.getUserName().equals(userName)).toList();
-        return new ArrayList<>(bookingForUuser);
+        List<Booking> bookingForUser = bookings.values().stream().filter(e -> e.getUserName().equals(userName)).toList();
+        return new ArrayList<>(bookingForUser);
     }
 
     public synchronized void saveBooking(Booking booking) {
