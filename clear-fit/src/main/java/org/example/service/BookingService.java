@@ -11,6 +11,7 @@ import org.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
@@ -19,7 +20,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final SlotRepository slotRepository;
 
-    private final ConcurrentHashMap<String, User> locksCache;
+    private final ConcurrentHashMap<String, ReentrantLock> locksCache;
 
     public BookingService(BookingRepository bookingRepository, UserRepository userRepository, SlotRepository slotRepository) {
         this.bookingRepository = bookingRepository;
@@ -29,42 +30,40 @@ public class BookingService {
     }
 
     public void addBooking(String userName, String centerName, String workoutType, int startTime, int endTime) {
+        locksCache.putIfAbsent(userName, new ReentrantLock());
+        ReentrantLock lock = locksCache.get(userName);
+        lock.lock();
         try {
-            if (!locksCache.containsKey(userName)) {
-                User user = userRepository.getUserByName(userName);
-                locksCache.put(userName, user);
+            Activity activity = Activity.valueOf(workoutType);
+            User user = userRepository.getUserByName(userName);
+            Slot slot = slotRepository.getSlotForCenterForTimingAndWorkoutType(centerName, startTime, endTime, activity);
+            if (!slot.bookSlot(user)) {
+                log.error("Slot is not free");
+                return;
             }
-            synchronized (locksCache.get(userName)) {
-                Activity activity = Activity.valueOf(workoutType);
-                User user = userRepository.getUserByName(userName);
-                Slot slot = slotRepository.getSlotForCenterForTimingAndWorkoutType(centerName, startTime, endTime, activity);
-                if (!slot.bookSlot(user)) {
-                    log.error("Slot is not free");
-                    return;
-                }
-                Booking booking = new Booking(centerName, userName, startTime, endTime, slot.getSlotId(), activity);
-                bookingRepository.saveBooking(booking);
-            }
+            Booking booking = new Booking(centerName, userName, startTime, endTime, slot.getSlotId(), activity);
+            bookingRepository.saveBooking(booking);
         } catch (Exception e) {
             log.error("Error occurred while trying to book the session for user", e);
+        } finally {
+            lock.unlock();
         }
     }
 
     public void cancelBooking(String userName, String centerName, String workOutType, int startTime, int endTime) {
+        locksCache.putIfAbsent(userName, new ReentrantLock());
+        ReentrantLock lock = locksCache.get(userName);
+        lock.lock();
         try {
-            if (!locksCache.containsKey(userName)) {
-                User user = userRepository.getUserByName(userName);
-                locksCache.put(userName, user);
-            }
-            synchronized (locksCache.get(userName)) {
-                Activity activity = Activity.valueOf(workOutType);
-                Booking booking = bookingRepository.getBookingFor(userName, centerName, activity, startTime, endTime);
-                bookingRepository.deleteBooking(booking);
-                Slot slot = slotRepository.getSlotById(booking.getSlotId());
-                User notifiedUser = slot.releaseSlot();
-            }
+            Activity activity = Activity.valueOf(workOutType);
+            Booking booking = bookingRepository.getBookingFor(userName, centerName, activity, startTime, endTime);
+            bookingRepository.deleteBooking(booking);
+            Slot slot = slotRepository.getSlotById(booking.getSlotId());
+            User notifiedUser = slot.releaseSlot();
         } catch (Exception e) {
             log.error("Exception occurred while trying to cancle booking ", e);
+        } finally {
+            lock.unlock();
         }
     }
 

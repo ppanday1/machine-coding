@@ -12,7 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Repository
 public class SlotRepository {
-    private ConcurrentHashMap<String, Slot> slots;
+    private final ConcurrentHashMap<String, Slot> slots;
 
     public SlotRepository() {
         slots = new ConcurrentHashMap<>();
