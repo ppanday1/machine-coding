@@ -30,8 +30,8 @@ public class BookingService {
     }
 
     public void addBooking(String userName, String centerName, String workoutType, int startTime, int endTime) {
-        locksCache.putIfAbsent(userName, new ReentrantLock());
-        ReentrantLock lock = locksCache.get(userName);
+        String lockKey = centerName + "_" + workoutType + "_" + startTime + "_" + endTime;
+        ReentrantLock lock = locksCache.computeIfAbsent(lockKey,k->new ReentrantLock());
         lock.lock();
         try {
             Activity activity = Activity.valueOf(workoutType);
@@ -47,12 +47,13 @@ public class BookingService {
             log.error("Error occurred while trying to book the session for user", e);
         } finally {
             lock.unlock();
+//            locksCache.remove(lockKey);
         }
     }
 
     public void cancelBooking(String userName, String centerName, String workOutType, int startTime, int endTime) {
-        locksCache.putIfAbsent(userName, new ReentrantLock());
-        ReentrantLock lock = locksCache.get(userName);
+        String lockKey = centerName + "_" + workOutType + "_" + startTime + "_" + endTime;
+        ReentrantLock lock = locksCache.computeIfAbsent(lockKey,k->new ReentrantLock());
         lock.lock();
         try {
             Activity activity = Activity.valueOf(workOutType);
@@ -64,6 +65,7 @@ public class BookingService {
             log.error("Exception occurred while trying to cancle booking ", e);
         } finally {
             lock.unlock();
+//            locksCache.remove(lockKey);
         }
     }
 

@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Slf4j
@@ -25,6 +27,7 @@ public class CenterService {
     private final CenterRepository centerRepository;
     private final SlotRepository slotRepository;
     private final SortingStrategyFactory sortingStrategyFactory;
+    private final ConcurrentHashMap<String, ReentrantLock> locks;
 
     public CenterService(CenterDetailRepository centerDetailRepository,
                          CenterRepository centerRepository,
@@ -34,34 +37,53 @@ public class CenterService {
         this.centerRepository = centerRepository;
         this.slotRepository = slotRepository;
         this.sortingStrategyFactory = sortingStrategyFactory;
+        this.locks = new ConcurrentHashMap<>();
     }
 
-    public synchronized void addCenter(String name) {
+    public void addCenter(String name) {
+        ReentrantLock lock = locks.computeIfAbsent(name, k -> new ReentrantLock());
+        lock.lock();
         try {
             Center center = new Center(name);
             centerRepository.saveCenter(center);
         } catch (Exception e) {
             log.error("Error occurred while trying to add center ", e);
+        } finally {
+            lock.unlock();
         }
     }
 
-    public synchronized void addCenterTiming(String name, List<Pair<Integer, Integer>> timings) {
-        if (!checkForConflict(timings)) {
-            log.error("Timing conflict found in the input");
-            return;
+    public void addCenterTiming(String name, List<Pair<Integer, Integer>> timings) {
+        ReentrantLock lock = locks.computeIfAbsent(name, k -> new ReentrantLock());
+        lock.lock();
+        try {
+            if (!checkForConflict(timings)) {
+                log.error("Timing conflict found in the input");
+                return;
+            }
+            centerDetailRepository.addCenterTiming(name, timings);
+        } finally {
+            lock.unlock();
         }
-        centerDetailRepository.addCenterTiming(name, timings);
     }
 
-    public synchronized void addActivity(String name, List<String> workouts) {
-        List<Activity> activities = new ArrayList<>();
-        for (String workoutType : workouts) {
-            activities.add(Activity.valueOf(workoutType));
+    public void addActivity(String name, List<String> workouts) {
+        ReentrantLock lock = locks.computeIfAbsent(name, k -> new ReentrantLock());
+        lock.lock();
+        try {
+            List<Activity> activities = new ArrayList<>();
+            for (String workoutType : workouts) {
+                activities.add(Activity.valueOf(workoutType));
+            }
+            centerDetailRepository.addCenterActivities(name, activities);
+        } finally {
+            lock.unlock();
         }
-        centerDetailRepository.addCenterActivities(name, activities);
     }
 
-    public synchronized void addCenterWorkout(String name, String activityType, int startTime, int endTime, int slotsAvailable) {
+    public void addCenterWorkout(String name, String activityType, int startTime, int endTime, int slotsAvailable) {
+        ReentrantLock lock = locks.computeIfAbsent(name, k -> new ReentrantLock());
+        lock.lock();
         try {
             Activity activity = Activity.valueOf(activityType);
             // check if center exists
@@ -96,6 +118,8 @@ public class CenterService {
             slotRepository.saveSlot(slot);
         } catch (Exception e) {
             log.error("Exception occurred while trying to update the workout slots", e);
+        } finally {
+            lock.unlock();
         }
     }
 

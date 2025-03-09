@@ -17,29 +17,33 @@ public class UserService {
 
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
-        this.locks=new ConcurrentHashMap<>();
+        this.locks = new ConcurrentHashMap<>();
     }
 
     public synchronized void addUser(String userName) {
-        ReentrantLock lock=locks.computeIfAbsent(userName,k->new ReentrantLock());
+        ReentrantLock lock = locks.computeIfAbsent(userName, k -> new ReentrantLock());
         lock.lock();
         try {
             User user = new User(userName);
             userRepository.saveUser(user);
         } catch (Exception e) {
             log.error("Error occurred while trying to add user ", e);
-        }finally {
+        } finally {
             lock.unlock();
-            locks.remove(userName);
+//            locks.remove(userName);
         }
     }
 
-    public User getUser(String name) {
+    public User getUser(String userName) {
+        ReentrantLock lock = locks.computeIfAbsent(userName, k -> new ReentrantLock());
+        lock.lock();
         try {
-            return userRepository.getUserByName(name);
+            return userRepository.getUserByName(userName);
         } catch (Exception e) {
             log.error("Error occurred while trying to find user ", e);
+            return null;
+        } finally {
+            lock.unlock();
         }
-        return null;
     }
 }
