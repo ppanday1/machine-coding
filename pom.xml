@@ -28,6 +28,7 @@
         <module>affiliate-system</module>
         <module>stackoverflow</module>
         <module>clear-fit</module>
+        <module>jira-management</module>
     </modules>
 
     <dependencies>
